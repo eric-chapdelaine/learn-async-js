@@ -1,1 +1,36 @@
 Explain the code execution based on the order of the messages logged in src/quiz/promise-2darray.txt.
+
+Here is the output (with line numbers) the original code yields:
+
+1  Sum called ... 
+2  returning from sum
+3  Promise { <pending> }
+4  Sum called ... 
+5  rejecting ... 
+6  returning from sum
+7  Promise { <rejected> 'BAD INPUT: Expected array as input' }
+8  node:internal/process/promises:289
+9              triggerUncaughtException(err, true /* fromPromise */);
+10             ^
+11  
+12 [UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "BAD INPUT: Expected array as input".] {
+13   code: 'ERR_UNHANDLED_REJECTION'
+14 }
+15
+16 Node.js v21.6.2
+
+We first call sum2DArray on valid input and it prints "Sum called ..."
+and then it prints "returning from sum" because the function inside of
+setTimeout is run independently from the rest of the code. Then,
+we print out the Promise with console.log(sumPromise1) and since the
+function inside of setTimeout hasn't completed yet, it says that it is pending.
+
+In the meantime, we call sum2DArray('array2D') and since it is not a valid
+input, it immedietly rejects this and returns (while printing "Rejecting ..." 
+and then "Returning from sum"). 
+
+Then, we print out the promise. But since this promise is rejected and we don't
+catch it, it is a triggerUncaughtException.
+
+We never see "resolving ..." from sumPromise1 because this exception was thrown
+before the setTimeout was complete.
