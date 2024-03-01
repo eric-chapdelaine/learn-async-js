@@ -1,17 +1,12 @@
-function sumOfARow(arr, rowIdx) {
-    return new Promise((resolve, reject) => {
-        if (arr.length > rowIdx) {
-            setTimeout(() => {
-                let sum = 0;
-                for (let i = 0; i < arr[rowIdx].length; ++i) {
-                    sum += arr[rowIdx][i];
-                }
-                resolve(sum);
-            }, 0);
-        } else {
-            reject("invalid input")
+async function sumOfARow(arr, rowIdx) {
+    if (arr.length > rowIdx) {
+        let sum = 0;
+        for (let i = 0; i < arr[rowIdx].length; ++i) {
+            sum += arr[rowIdx][i];
         }
-    });
+        return sum;
+    }
+    throw "Index out of bounds";
 }
 
 const array2D = [
@@ -25,14 +20,18 @@ for (let x = 0; x < array2D.length; ++x) {
     rowSumPromises.push(sumOfARow(array2D, x));
 }
 
-Promise.all(rowSumPromises)
-    .then((sums) => {
-        let total = 0;
-        for (const sum of sums) {
+async function main() {
+    let total = 0;
+    try {
+
+        rowSums = await Promise.all(rowSumPromises);
+        for (const sum of rowSums) {
             total += sum;
         }
         console.log(`Total: ${total}`);
-    })
-    .catch ((err) => {
-        console.log(err);
-    });
+    } catch (err) {
+        console.err(err);
+    }
+}
+
+main();
